@@ -5,8 +5,42 @@ import { createServer as createViteServer } from "vite";
 import { fileURLToPath } from "url";
 import { QuizPage, Student, StudentSubmission, QuestionType } from "./src/types.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+let resolvedFilename = "";
+let resolvedDirname = "";
+
+try {
+  // @ts-ignore
+  if (typeof __filename !== "undefined") {
+    // @ts-ignore
+    resolvedFilename = __filename;
+  }
+} catch (e) {}
+
+try {
+  // @ts-ignore
+  if (typeof __dirname !== "undefined") {
+    // @ts-ignore
+    resolvedDirname = __dirname;
+  }
+} catch (e) {}
+
+if (!resolvedFilename) {
+  try {
+    // @ts-ignore
+    if (typeof import.meta !== "undefined" && import.meta && import.meta.url) {
+      resolvedFilename = fileURLToPath(import.meta.url);
+      resolvedDirname = path.dirname(resolvedFilename);
+    }
+  } catch (e) {}
+}
+
+if (!resolvedFilename) {
+  resolvedDirname = process.cwd();
+  resolvedFilename = path.join(resolvedDirname, "server.ts");
+}
+
+const __filename = resolvedFilename;
+const __dirname = resolvedDirname;
 
 const app = express();
 const PORT = 3000;
